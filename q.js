@@ -1077,6 +1077,13 @@ function trackRejection(promise, reason) {
         Q.nextTick.runAfter(function () {
             if (array_indexOf(unhandledRejections, promise) !== -1) {
                 process.emit("unhandledRejection", reason, promise);
+                if (Q.onunhandledrejection) {
+                    Q.onunhandledrejection({
+                        type: "unhandledrejection",
+                        reason: reason,
+                        promise: promise
+                    });
+                }
                 reportedUnhandledRejections.push(promise);
             }
         });
@@ -1102,6 +1109,13 @@ function untrackRejection(promise) {
                 var atReport = array_indexOf(reportedUnhandledRejections, promise);
                 if (atReport !== -1) {
                     process.emit("rejectionHandled", unhandledReasons[at], promise);
+                    if (Q.onrejectionhandled) {
+                        Q.onrejectionhandled({
+                            type: "rejectionhandled",
+                            reason: unhandledReasons[at],
+                            promise: promise
+                        });
+                    }
                     reportedUnhandledRejections.splice(atReport, 1);
                 }
             });
